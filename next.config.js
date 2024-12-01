@@ -1,6 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: false,
+  images: {
+    domains: ['storage.googleapis.com'], // Add this line
+  },
   env: {
     OPENAI_API_KEY: process.env.OPENAI_API_KEY,
     MIXPANEL_PROJECT_TOKEN: process.env.MIXPANEL_PROJECT_TOKEN,

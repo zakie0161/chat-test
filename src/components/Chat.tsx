@@ -6,6 +6,9 @@ import useAnalytics from "@/hooks/useAnalytics";
 import useAutoResizeTextArea from "@/hooks/useAutoResizeTextArea";
 import Message from "./Message";
 import { DEFAULT_OPENAI_MODEL } from "@/shared/Constants";
+import { chatChart, chatCustomPrompt, chatCustomPromptStream, chatDatabase, getSources } from "@/pages/home/core/_request";
+import { Source } from "@/pages/home/core/_models";
+import PopupMenu from "./PopupMenu";
 
 const Chat = (props: any) => {
   const { toggleComponentVisibility } = props;
@@ -14,7 +17,9 @@ const Chat = (props: any) => {
   const [errorMessage, setErrorMessage] = useState("");
   const [showEmptyChat, setShowEmptyChat] = useState(true);
   const [conversation, setConversation] = useState<any[]>([]);
+  const [sources, setSources] = useState<Source[]>([]);
   const [message, setMessage] = useState("");
+  const [selectedSource, setSelectedSource] = useState<Source>();
   const { trackEvent } = useAnalytics();
   const textAreaRef = useAutoResizeTextArea();
   const bottomOfChatRef = useRef<HTMLDivElement>(null);
@@ -33,6 +38,90 @@ const Chat = (props: any) => {
       bottomOfChatRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [conversation]);
+
+  const getSource = () => {
+    setIsLoading(true);
+    getSources().then((data) => {
+      var results = data.result
+      setSources(results ?? [])
+    })
+      .catch((e) => {
+        console.error(e);
+      })
+      .finally(() => setIsLoading(false));
+  };
+
+  useEffect(() => {
+    getSource();
+  }, []);
+
+  const handleChatStream = async (body: Record<string, any>) => {
+    try {
+      const stream = await chatCustomPromptStream(body);
+
+      if (!stream) {
+        throw new Error("No response stream received.");
+      }
+
+      const reader = stream.getReader();
+      const decoder = new TextDecoder("utf-8");
+      let done = false;
+
+      setConversation([
+        ...conversation,
+        { content: message, role: "user" },
+        { content: null, role: "system" },
+      ]);
+
+      let systemResponse = '';
+      while (!done) {
+        const { value, done: readerDone } = await reader.read();
+        done = readerDone;
+        if (value) {
+          const chunk = decoder.decode(value);
+          systemResponse += chunk; // accumulate chunks into one response
+          console.log("Chunk received:", chunk);
+
+          setConversation((prevList) => {
+            const updatedList = [...prevList];
+            updatedList[updatedList.length - 1] = { content: systemResponse, role: "system" }; // Update the last item
+            console.log(updatedList)
+            return updatedList;
+          });
+
+          // Process each chunk (e.g., append to UI or store it)
+        }
+      }
+    } catch (error) {
+      console.error("Error processing stream:", error);
+    }
+  };
+
+  const handleChatDatabase = async (body: Record<string, any>) => {
+    var response = await chatDatabase(body);
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data.result)
+        // Add the message to the conversation
+        setConversation([
+          ...conversation,
+          { content: message, role: "user" },
+          { 
+            content: data.result, 
+            role: "system", 
+            table: data.table ?? false, 
+            chart: data?.chart, 
+            database_guid: body?.guid, 
+          },
+        ]);
+        
+        
+      } else {
+        console.error(response);
+        setErrorMessage(response.statusText);
+      }
+  };
 
   const sendMessage = async (e: any) => {
     e.preventDefault();
@@ -60,29 +149,27 @@ const Chat = (props: any) => {
     setShowEmptyChat(false);
 
     try {
-      const response = await fetch(`/api/openai`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          messages: [...conversation, { content: message, role: "user" }],
-          model: selectedModel,
-        }),
-      });
+      // const response = await fetch(`/api/openai`, {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify({
+      //     messages: [...conversation, { content: message, role: "user" }],
+      //     model: selectedModel,
+      //   }),
+      // });
 
-      if (response.ok) {
-        const data = await response.json();
 
-        // Add the message to the conversation
-        setConversation([
-          ...conversation,
-          { content: message, role: "user" },
-          { content: data.message, role: "system" },
-        ]);
-      } else {
-        console.error(response);
-        setErrorMessage(response.statusText);
+      const body = {
+        input: message,
+        guid: selectedSource?.guid ?? ''
+      }
+
+      if(selectedSource?.type === 'database'){
+        handleChatDatabase(body);
+      }else{
+        handleChatStream(body);
       }
 
       setIsLoading(false);
@@ -165,9 +252,9 @@ const Chat = (props: any) => {
                       </button>
                     </div>
                   </div>
-                  <h1 className="text-2xl sm:text-4xl font-semibold text-center text-gray-200 dark:text-gray-600 flex gap-2 items-center justify-center h-screen">
-                    ChatGPT Clone
-                  </h1>
+                  {/* <h1 className="text-2xl sm:text-4xl font-semibold text-center text-gray-200 dark:text-gray-600 flex gap-2 items-center justify-center h-screen">
+                  ChatGPT Clone
+                </h1> */}
                 </div>
               ) : null}
               <div className="flex flex-col items-center text-sm dark:bg-gray-800"></div>
@@ -218,6 +305,9 @@ const Chat = (props: any) => {
             </span>
           </div>
         </div>
+        {sources.length > 0 && <div className="absolute top-0 left-0 p-4">
+          <PopupMenu sources={sources} handleSelectedSource={(source) => setSelectedSource(source)} />
+        </div>}
       </div>
     </div>
   );
