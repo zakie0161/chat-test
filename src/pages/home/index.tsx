@@ -4,7 +4,11 @@ import MobileSiderbar from "@/components/MobileSidebar";
 import Sidebar from "@/components/Sidebar";
 import useAnalytics from "@/hooks/useAnalytics";
 
-export default function Home() {
+interface HomeProps {
+  guid?: string
+}
+
+const Home: React.FC<HomeProps> = ({ guid }) => {
   const [isComponentVisible, setIsComponentVisible] = useState(false);
   const { trackEvent } = useAnalytics();
 
@@ -26,7 +30,9 @@ export default function Home() {
           <Sidebar />
         </div>
       </div>
-      <Chat toggleComponentVisibility={toggleComponentVisibility} />
+      <Chat toggleComponentVisibility={toggleComponentVisibility} guid={guid} />
     </main>
   );
 }
+
+export default Home;

@@ -30,7 +30,7 @@ const CreateNewConnectionSQL: React.FC<ModalProps> = ({ setIsOpen, data }) => {
     const databases = [
         {
             id: 1,
-            uniq: "postgree-sql",
+            uniq: "postgresql",
             name: "PostgreSQL",
             logo: "https://i0.wp.com/softwareengineeringdaily.com/wp-content/uploads/2016/10/PostgreSQL.png?fit=610%2C280",
         },
@@ -42,13 +42,13 @@ const CreateNewConnectionSQL: React.FC<ModalProps> = ({ setIsOpen, data }) => {
         },
         {
             id: 3,
-            uniq: "sql-server",
+            uniq: "mssql",
             name: "SQL Server",
             logo: "https://www.techsoupindonesia.or.id/sites/default/files/SQL-Server-2012_0.png",
         },
         {
             id: 4,
-            uniq: "oracle-server",
+            uniq: "oracle",
             name: "Oracle Server",
             logo: "https://download.logo.wine/logo/Oracle_Database/Oracle_Database-Logo.wine.png",
         },

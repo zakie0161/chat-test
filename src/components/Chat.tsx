@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useRef, useState } from "react";
 import { FiSend } from "react-icons/fi";
 import { BsChevronDown, BsPlusLg } from "react-icons/bs";
@@ -6,12 +7,15 @@ import useAnalytics from "@/hooks/useAnalytics";
 import useAutoResizeTextArea from "@/hooks/useAutoResizeTextArea";
 import Message from "./Message";
 import { DEFAULT_OPENAI_MODEL } from "@/shared/Constants";
-import { chatChart, chatCustomPrompt, chatCustomPromptStream, chatDatabase, getSources } from "@/pages/home/core/_request";
+import { chatChart, chatCustomPrompt, chatCustomPromptStream, chatDatabase, createThread, getSources, getThread } from "@/pages/home/core/_request";
 import { Source } from "@/pages/home/core/_models";
 import PopupMenu from "./PopupMenu";
+import { useRouter } from "next/router";
 
 const Chat = (props: any) => {
-  const { toggleComponentVisibility } = props;
+  const { toggleComponentVisibility, guid } = props;
+
+  const router = useRouter();
 
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -51,11 +55,43 @@ const Chat = (props: any) => {
       .finally(() => setIsLoading(false));
   };
 
+  const getThreadDetail = () => {
+    setIsLoading(true);
+    getThread(guid).then((data) => {
+      var results = data.result
+      setConversation(results?.history ?? [])
+      setShowEmptyChat(false)
+    })
+      .catch((e) => {
+        console.error(e);
+      })
+      .finally(() => setIsLoading(false));
+  };
+
   useEffect(() => {
     getSource();
+
+    var message = localStorage.getItem("message")
+    if(message){
+      setMessage(message)
+      sendMessage(null!, message)
+      if (textAreaRef.current) {
+        textAreaRef.current.focus();
+      }
+      localStorage.setItem("message", "")
+    }
+
   }, []);
 
-  const handleChatStream = async (body: Record<string, any>) => {
+  useEffect(() => {
+    
+    if(guid){
+      getThreadDetail()
+    }
+
+  }, [guid]);
+
+  const handleChatStream = async (body: Record<string, any>, newMessage: string) => {
     try {
       const stream = await chatCustomPromptStream(body);
 
@@ -69,7 +105,7 @@ const Chat = (props: any) => {
 
       setConversation([
         ...conversation,
-        { content: message, role: "user" },
+        { content: newMessage, role: "user" },
         { content: null, role: "system" },
       ]);
 
@@ -123,53 +159,71 @@ const Chat = (props: any) => {
       }
   };
 
-  const sendMessage = async (e: any) => {
-    e.preventDefault();
+  const handleNewThread = async () => {
+    setIsLoading(true)
+    var response = await createThread({
+      name: 'New Chat',
+    })
+    .finally(() => setIsLoading(false));
+
+    if (response.ok) {
+      const data = await response.json();
+      router.push('/c/'+data.guid)
+      // setThreads(data.result)
+      // getThread()
+      localStorage.setItem("message", message);
+
+    } else {
+      console.error(response);
+      // setErrorMessage(response.statusText);
+    }
+};
+
+  const sendMessage = async (e: any, messageFromStart?: string) => {
+
+    let newMessage = messageFromStart? messageFromStart : message
+
+    e?.preventDefault();
 
     // Don't send empty messages
-    if (message.length < 1) {
+    if (newMessage.length < 1) {
       setErrorMessage("Please enter a message.");
       return;
     } else {
       setErrorMessage("");
     }
 
-    trackEvent("send.message", { message: message });
+    trackEvent("send.message", { message: newMessage });
     setIsLoading(true);
 
     // Add the message to the conversation
     setConversation([
       ...conversation,
-      { content: message, role: "user" },
+      { content: newMessage, role: "user" },
       { content: null, role: "system" },
     ]);
+
+    if(!guid && e){
+      handleNewThread();
+      return;
+    }
 
     // Clear the message & remove empty chat
     setMessage("");
     setShowEmptyChat(false);
 
     try {
-      // const response = await fetch(`/api/openai`, {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify({
-      //     messages: [...conversation, { content: message, role: "user" }],
-      //     model: selectedModel,
-      //   }),
-      // });
-
-
+     
       const body = {
-        input: message,
-        guid: selectedSource?.guid ?? ''
+        input: newMessage,
+        guid: selectedSource?.guid ?? '',
+        thread_guid: guid
       }
 
       if(selectedSource?.type === 'database'){
         handleChatDatabase(body);
       }else{
-        handleChatStream(body);
+        handleChatStream(body, newMessage);
       }
 
       setIsLoading(false);

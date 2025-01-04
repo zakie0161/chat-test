@@ -1,5 +1,5 @@
 import { SQLConnection, TrainingConnection } from "@/pages/settings/core/_models";
-import { createTrainingConnection, getTrainingConnections } from "@/pages/settings/core/_requests";
+import { createTrainingConnection, getTrainingConnections, nlToSqlStream } from "@/pages/settings/core/_requests";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 const sqlFormatter = require("sql-formatter");
@@ -13,10 +13,13 @@ const TrainingDatabase: React.FC<ModalProps> = ({ setIsOpen, sqlConnection }) =>
 
   const [trainingConnections, setTrainingConnections] = useState<Array<TrainingConnection>>([]);
   const [isLoading, setIsLoading] = useState(false); // Loading state
+  const [isLoadingGenerate, setIsLoadingGenerate] = useState(false); // Loading state
+  const [isGenerateIndex, setIsGenerateIndex] = useState(-1); // Loading state
+  const [generate, setGenerate] = useState(''); // Loading state
 
   const beautifyQuery = (element: HTMLElement, index: number) => {
     // Add `sql-formatter` as a dependency
-    const query = element.innerText;
+    const query = parsingQuery(element.innerText);
     const beautifiedQuery = sqlFormatter.format(query);
     element.innerText = beautifiedQuery;
 
@@ -28,6 +31,15 @@ const TrainingDatabase: React.FC<ModalProps> = ({ setIsOpen, sqlConnection }) =>
     setTrainingConnections(updatedConnections);
   };
 
+  const handlePromptKeyPress = (e: React.KeyboardEvent<HTMLElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      setGenerate('')
+      setIsGenerateIndex(-1); // Sembunyikan prompt
+      handleSubmitDescribeQuery();
+    }
+  };
+
   const handleAddNew = () => {
     setTrainingConnections([...trainingConnections, {
       guid: '',
@@ -36,6 +48,10 @@ const TrainingDatabase: React.FC<ModalProps> = ({ setIsOpen, sqlConnection }) =>
       query: '',
       description: ''
     }])
+  }
+
+  const parsingQuery = (query: any) => {
+    return query?.replaceAll('iniquerysql', '').replaceAll('iniquery', '')
   };
 
   const handleDelete = (index: number) => {
@@ -43,15 +59,68 @@ const TrainingDatabase: React.FC<ModalProps> = ({ setIsOpen, sqlConnection }) =>
     setTrainingConnections(updatedItems)
   };
 
+  const handleSubmitDescribeQuery = async () => {
+    setIsLoadingGenerate(true);
+
+    const body = {
+      input: generate
+    }
+
+    try {
+      const stream = await nlToSqlStream(body);
+
+      if (!stream) {
+        throw new Error("No response stream received.");
+      }
+
+      const reader = stream.getReader();
+      const decoder = new TextDecoder("utf-8");
+      let done = false;
+
+      setTrainingConnections((prevList) =>
+        prevList.map((item, idx) => (idx === isGenerateIndex ? {...item, query: ''} : item))
+      );
+
+      let systemResponse = '';
+      while (!done) {
+        const { value, done: readerDone } = await reader.read();
+        done = readerDone;
+        if (value) {
+          const chunk = decoder.decode(value).replaceAll('```', 'iniquery');
+          systemResponse += chunk; // accumulate chunks into one response
+
+          setTrainingConnections((prevList) =>
+            prevList.map((item, idx) => (idx === isGenerateIndex ? {...item, query: systemResponse} : item))
+          );
+
+          // setConversation((prevList) => {
+          //   const updatedList = [...prevList];
+          //   updatedList[updatedList.length - 1] = { content: systemResponse, role: "system" }; // Update the last item
+          //   console.log(updatedList)
+          //   return updatedList;
+          // });
+
+          // Process each chunk (e.g., append to UI or store it)
+        }
+      }
+    } catch (error) {
+      console.error("Error processing stream:", error);
+    } finally {
+      setIsLoadingGenerate(false);
+    }
+
+    // Perform further actions, e.g., API call or saving to storage
+  };
+
   const handleSubmit = () => {
     setIsLoading(true);
 
     const updatedTrainingConnections = trainingConnections.map((trainingConnection) => {
       return {
-          ...trainingConnection, // Spread the existing properties of trainingConnection
-          database_guid: sqlConnection.guid // Or assign the appropriate value for `database_guid`
+        ...trainingConnection, // Spread the existing properties of trainingConnection
+        database_guid: sqlConnection.guid // Or assign the appropriate value for `database_guid`
       };
-  });
+    });
 
     createTrainingConnection(updatedTrainingConnections).then((data) => {
       toast.success("Training connection saved successfully!"); // Success toast
@@ -136,16 +205,38 @@ const TrainingDatabase: React.FC<ModalProps> = ({ setIsOpen, sqlConnection }) =>
                 suppressContentEditableWarning={true}
                 onBlur={(e) => beautifyQuery(e.target as HTMLElement, index)}
               >
-                {sqlFormatter.format(item.query)}
+                {parsingQuery(item.query)}{/* {isLoadingGenerate? parsingQuery(item.query) : sqlFormatter.format(parsingQuery(item.query))} */}
               </pre>
               <div className="flex space-x-2 mt-2">
                 <button className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
                   <i className="fas fa-play mr-2"></i> Run
                 </button>
-                <button className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">
-                  <i className="fas fa-magic mr-2"></i> Generate
+                <button
+                  onClick={() => {
+                    setGenerate('')
+                    setIsGenerateIndex(isGenerateIndex === index? -1 : index);
+                  }}
+                  className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">
+                  {isLoadingGenerate ? (
+                    <div className="flex items-center justify-center">
+                      <div className="spinner-border animate-spin inline-block w-4 h-4 border-2 rounded-full mr-2"></div>
+                      Generating...
+                    </div>
+                  ) : (
+                    <>
+                      <i className="fas fa-magic mr-2"></i> Generate
+                    </>
+                  )}
                 </button>
               </div>
+              {isGenerateIndex === index && <input
+                type="text"
+                className="text-xs mt-3 mb-2 w-full bg-gray-100 rounded p-2"
+                placeholder="Describe your query to generate"
+                defaultValue={generate}
+                onChange={(e) => setGenerate(e.target.value)}
+                onKeyDown={handlePromptKeyPress}
+              />}
               <textarea
                 className="bg-gray-100 p-2 rounded w-full mt-2"
                 rows={2}

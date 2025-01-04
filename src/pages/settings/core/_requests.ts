@@ -6,6 +6,7 @@ const CUSTOM_PROMPT_API_URL = '/custom-prompt'
 const SQL_CONNECTION_API_URL = '/sql-connection'
 const TRAINING_CONNECTION_API_URL = '/training-connection'
 const GET_AI_HOST_API_URL = '/get-ai-host'
+const NL_TO_SQL_API_URL = '/nl-to-sql'
 
 const LIST_CUSTOM_PROMPT_API_URL = '/get-list-custom-prompt'
 const LIST_SQL_CONNECTION_API_URL = '/get-list-sql-connection'
@@ -95,6 +96,36 @@ const getTrainingConnections = (guid: string): Promise<BaseResponse<Array<Traini
   }).then((d: any) => d.json())
 }
 
+const nlToSqlStream = async (body: Record<string, any>): Promise<ReadableStream | void> => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}${NL_TO_SQL_API_URL}-stream`,
+      {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Server Error: ${errorText}`);
+    }
+
+    if (!response.body) {
+      throw new Error("Response body is null.");
+    }
+
+    return response.body; // Guaranteed to be a ReadableStream here
+  } catch (error) {
+    console.error("Error in chatCustomPromptStream:", error);
+    throw error; // Rethrow the error for upstream handling
+  }
+};
+
 const updateCustomPrompt = (body: any): Promise<any> => {
   return fetch(`${process.env.NEXT_PUBLIC_API_URL}${CUSTOM_PROMPT_API_URL}`, {
     method: "PUT",
@@ -168,6 +199,7 @@ export {
   getCustomPrompts, 
   getSQLConnections,
   getTrainingConnections,
+  nlToSqlStream,
   updateCustomPrompt,
   updateSQLConnection, 
   updateTrainingConnection, 
