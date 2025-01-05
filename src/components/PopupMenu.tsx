@@ -1,13 +1,15 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { Source } from "@/pages/home/core/_models";
 import { useEffect, useRef, useState } from "react";
 import { BiChevronDown } from "react-icons/bi";
 
 interface ModalProps {
   sources?: Source[]
+  selectedSource?: string
   handleSelectedSource: (source: Source) => void;
 }
 
-const PopupMenu: React.FC<ModalProps> = ({ sources, handleSelectedSource }) => {
+const PopupMenu: React.FC<ModalProps> = ({ sources, selectedSource, handleSelectedSource }) => {
   const [isPopupVisible, setIsPopupVisible] = useState<boolean>(false);
   const [popupPosition, setPopupPosition] = useState<string>("top-12");
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
@@ -37,6 +39,18 @@ const PopupMenu: React.FC<ModalProps> = ({ sources, handleSelectedSource }) => {
       else if (isOverflowingTop) setPopupPosition("top-12");
     }
   }, [isPopupVisible]);
+
+  useEffect(() => {
+      if (selectedSource && (sources ?? []).length > 0) {
+        const index = sources?.findIndex((item) =>
+          item.guid === selectedSource
+        );
+        handleSelected(index!);
+      }else {
+        handleSelected(-1);
+      }
+   
+  }, [sources, selectedSource]);
 
   // Close popup on outside click
   useEffect(() => {

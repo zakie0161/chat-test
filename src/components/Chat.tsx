@@ -8,7 +8,7 @@ import useAutoResizeTextArea from "@/hooks/useAutoResizeTextArea";
 import Message from "./Message";
 import { DEFAULT_OPENAI_MODEL } from "@/shared/Constants";
 import { chatChart, chatCustomPrompt, chatCustomPromptStream, chatDatabase, createThread, getSources, getThread } from "@/pages/home/core/_request";
-import { Source } from "@/pages/home/core/_models";
+import { Source, ThreadDetail } from "@/pages/home/core/_models";
 import PopupMenu from "./PopupMenu";
 import { useRouter } from "next/router";
 
@@ -21,9 +21,11 @@ const Chat = (props: any) => {
   const [errorMessage, setErrorMessage] = useState("");
   const [showEmptyChat, setShowEmptyChat] = useState(true);
   const [conversation, setConversation] = useState<any[]>([]);
+  const [threadDetail, setThreadDetail] = useState<ThreadDetail>();
   const [sources, setSources] = useState<Source[]>([]);
   const [message, setMessage] = useState("");
   const [selectedSource, setSelectedSource] = useState<Source>();
+  const [initSelectedSource, setInitSelectedSource] = useState<string>("");
   const { trackEvent } = useAnalytics();
   const textAreaRef = useAutoResizeTextArea();
   const bottomOfChatRef = useRef<HTMLDivElement>(null);
@@ -59,6 +61,8 @@ const Chat = (props: any) => {
     setIsLoading(true);
     getThread(guid).then((data) => {
       var results = data.result
+      setThreadDetail(results?.detail)
+      setInitSelectedSource(results?.detail?.source ?? "")
       setConversation(results?.history ?? [])
       setShowEmptyChat(false)
     })
@@ -69,27 +73,39 @@ const Chat = (props: any) => {
   };
 
   useEffect(() => {
+    
+    var message = localStorage.getItem("message")
+    var sourceGuid = localStorage.getItem("source_guid")
+
+    if(guid){
+      if(message){
+
+        setMessage(message)
+        sendMessage(null!, message, sourceGuid?.toString())
+        if (textAreaRef.current) {
+          textAreaRef.current.focus();
+        }
+        localStorage.setItem("message", "")
+
+      }else {
+        getThreadDetail()
+      }
+      
+    }
+
     getSource();
 
-    var message = localStorage.getItem("message")
-    if(message){
-      setMessage(message)
-      sendMessage(null!, message)
-      if (textAreaRef.current) {
-        textAreaRef.current.focus();
-      }
-      localStorage.setItem("message", "")
-    }
-
-  }, []);
+  }, [guid]);
 
   useEffect(() => {
-    
-    if(guid){
-      getThreadDetail()
+
+    var sourceGuid = localStorage.getItem("source_guid")
+    if(sourceGuid){
+      setInitSelectedSource(sourceGuid)
+      localStorage.setItem("source_guid", "")
     }
 
-  }, [guid]);
+  }, [sources, guid]);
 
   const handleChatStream = async (body: Record<string, any>, newMessage: string) => {
     try {
@@ -116,12 +132,12 @@ const Chat = (props: any) => {
         if (value) {
           const chunk = decoder.decode(value);
           systemResponse += chunk; // accumulate chunks into one response
-          console.log("Chunk received:", chunk);
+          // console.log("Chunk received:", chunk);
 
           setConversation((prevList) => {
             const updatedList = [...prevList];
             updatedList[updatedList.length - 1] = { content: systemResponse, role: "system" }; // Update the last item
-            console.log(updatedList)
+            // console.log(updatedList)
             return updatedList;
           });
 
@@ -163,15 +179,17 @@ const Chat = (props: any) => {
     setIsLoading(true)
     var response = await createThread({
       name: 'New Chat',
+      source_guid: selectedSource?.guid ?? '',
+      type: selectedSource?.type ?? ''
     })
     .finally(() => setIsLoading(false));
 
+    localStorage.setItem("message", message);
+    localStorage.setItem("source_guid", selectedSource?.guid ?? '');
+    
     if (response.ok) {
       const data = await response.json();
       router.push('/c/'+data.guid)
-      // setThreads(data.result)
-      // getThread()
-      localStorage.setItem("message", message);
 
     } else {
       console.error(response);
@@ -179,7 +197,7 @@ const Chat = (props: any) => {
     }
 };
 
-  const sendMessage = async (e: any, messageFromStart?: string) => {
+  const sendMessage = async (e: any, messageFromStart?: string, sourceGuid?: string) => {
 
     let newMessage = messageFromStart? messageFromStart : message
 
@@ -216,7 +234,7 @@ const Chat = (props: any) => {
      
       const body = {
         input: newMessage,
-        guid: selectedSource?.guid ?? '',
+        guid: sourceGuid ?? selectedSource?.guid ?? '',
         thread_guid: guid
       }
 
@@ -360,7 +378,7 @@ const Chat = (props: any) => {
           </div>
         </div>
         {sources.length > 0 && <div className="absolute top-0 left-0 p-4">
-          <PopupMenu sources={sources} handleSelectedSource={(source) => setSelectedSource(source)} />
+          <PopupMenu selectedSource={initSelectedSource} sources={sources} handleSelectedSource={(source) => setSelectedSource(source)} />
         </div>}
       </div>
     </div>

@@ -12,6 +12,8 @@ const LIST_THREAD_API_URL = '/get-list-thread'
 
 const GET_THREAD_API_URL = '/get-thread'
 
+const CLEAR_THREAD_API_URL = '/clear-thread'
+
 const chatCustomPrompt = (body: any): Promise<any> => {
     return fetch(`${process.env.NEXT_PUBLIC_API_URL}${CHAT_CUSTOM_PROMPT_API_URL}`, {
       method: "POST",
@@ -129,6 +131,16 @@ const deleteThread = (guid: string): Promise<BaseResponse<any>> => {
   }).then((d: any) => d.json())
 }
 
+const clearThread = (): Promise<BaseResponse<any>> => {
+  return fetch(`${process.env.NEXT_PUBLIC_API_URL}${CLEAR_THREAD_API_URL}`, {
+    method: "DELETE",
+    credentials: 'include',
+    headers: {
+      "Content-Type": "application/json",
+    },
+  }).then((d: any) => d.json())
+}
+
 export {
     chatCustomPrompt,
     chatCustomPromptStream,
@@ -138,5 +150,6 @@ export {
     getSources,
     getThreads,
     getThread,
-    deleteThread
+    deleteThread,
+    clearThread
 }

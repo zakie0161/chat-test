@@ -15,7 +15,6 @@ const HostSetting: React.FC = () => {
     setHostAI({
       'host': host
     }).then((data) => {
-      console.log(data)
       toast.success("Host saved successfully!"); // Success toast
     })
       .catch((e) => {

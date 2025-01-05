@@ -1,4 +1,4 @@
-import { createThread, deleteThread, getThreads } from "@/pages/home/core/_request";
+import { clearThread, createThread, deleteThread, getThreads } from "@/pages/home/core/_request";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import {
@@ -18,6 +18,8 @@ import { useRouter } from "next/router";
 const Sidebar = () => {
 
   const router = useRouter();
+
+  const segment = router.asPath.split('/')[2];
 
   const [threads, setThreads] = useState<Thread[]>();
 
@@ -57,7 +59,20 @@ const Sidebar = () => {
     setIsLoading(true);
     deleteThread(guid).then((data) => {
       var result = data.result
-      router.push("/home")
+      router.push("/")
+      getThread()
+    })
+      .catch((e) => {
+        console.error(e);
+      })
+      .finally(() => setIsLoading(false));
+  };
+
+  const clearThreadData = () => {
+    setIsLoading(true);
+    clearThread().then((data) => {
+      var result = data.result
+      router.push("/")
     })
       .catch((e) => {
         console.error(e);
@@ -87,33 +102,38 @@ const Sidebar = () => {
         <div className="flex-col flex-1 overflow-y-auto border-b border-white/20">
           <div className="flex flex-col gap-2 pb-2 text-gray-100 text-sm">
             {!isLoading && threads?.map((item, index) => (
-              <Link 
-                href={`/c/${item.guid}`} 
+              <div
                 key={item.guid}
-                onClick={(e) => e.stopPropagation()} >
-                <div
-                  className="flex py-3 px-3 items-center gap-3 relative rounded-md hover:bg-[#2A2B32] cursor-pointer break-all hover:pr-4 group">
-                  <FiMessageSquare className="h-4 w-4" />
+                className={`flex py-3 px-3 items-center gap-3 relative rounded-md hover:bg-[#2A2B32] cursor-pointer break-all hover:pr-4 group ${segment===item.guid?"bg-[#3e3f49]":""}`}>
+                <FiMessageSquare className="h-4 w-4" />
+                <Link
+                  className="flex-1"
+                  href={`/c/${item.guid}`}
+                  onClick={(e) => e.stopPropagation()} >
                   <div className="flex-1 text-ellipsis max-h-5 overflow-hidden break-all relative">
                     {item.name}
-                    <div className="absolute inset-y-0 right-0 w-8 z-10 bg-gradient-to-l from-gray-900 group-hover:from-[#2A2B32]"></div>
+                    <div className="absolute inset-y-0 right-0 w-8 z-10 bg-gradient-to-l group-hover:from-[#2A2B32]"></div>
                   </div>
-                  <FaTimes
-                    onClick={(e) => {
-                      e.stopPropagation(); // Prevent click from triggering the parent `Link`
-                      deleteThreadData(item.guid!);
-                    }}
-                    className="h-4 w-4 text-gray-400 hover:text-red-500 cursor-pointer"
-                  />
-                </div>
-              </Link>
+                </Link>
+                <FaTimes
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent click from triggering the parent `Link`
+                    deleteThreadData(item.guid!);
+                  }}
+                  className="h-4 w-4 text-gray-400 hover:text-red-500 cursor-pointer"
+                />
+              </div>
             ))}
           </div>
         </div>
-        <a className="flex py-3 px-3 items-center gap-3 rounded-md hover:bg-gray-500/10 transition-colors duration-200 text-white cursor-pointer text-sm">
-          <AiOutlineMessage className="h-4 w-4" />
+        {(threads ?? []).length > 0 && 
+        <a 
+        className="flex py-3 px-3 items-center gap-3 rounded-md hover:bg-gray-500/10 transition-colors duration-200 text-white cursor-pointer text-sm"
+        onClick={() => clearThreadData()} >
+          <AiOutlineMessage
+            className="h-4 w-4"/>
           Clear conversations
-        </a>
+        </a>}
         <a className="flex py-3 px-3 items-center gap-3 rounded-md hover:bg-gray-500/10 transition-colors duration-200 text-white cursor-pointer text-sm">
           <AiOutlineUser className="h-4 w-4" />
           My plan
