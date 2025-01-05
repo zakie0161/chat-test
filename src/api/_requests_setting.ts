@@ -15,7 +15,7 @@ const LIST_TRAINING_CONNECTION_API_URL = '/get-list-training-connection'
 const setHostAI = (body: any): Promise<any> => {
   return fetch(`${process.env.NEXT_PUBLIC_API_URL}${SET_AI_HOST_API_URL}`, {
     method: "POST",
-    credentials: 'include',
+    // credentials: 'include',
     headers: {
       "Content-Type": "application/json",
     },
@@ -26,7 +26,7 @@ const setHostAI = (body: any): Promise<any> => {
 const createCustomPrompt = (body: any): Promise<any> => {
   return fetch(`${process.env.NEXT_PUBLIC_API_URL}${CUSTOM_PROMPT_API_URL}`, {
     method: "POST",
-    credentials: 'include',
+    // credentials: 'include',
     headers: {
       "Content-Type": "application/json",
     },
@@ -37,7 +37,7 @@ const createCustomPrompt = (body: any): Promise<any> => {
 const createSQLConnection = (body: any): Promise<any> => {
   return fetch(`${process.env.NEXT_PUBLIC_API_URL}${SQL_CONNECTION_API_URL}`, {
     method: "POST",
-    credentials: 'include',
+    // credentials: 'include',
     headers: {
       "Content-Type": "application/json",
     },
@@ -48,7 +48,7 @@ const createSQLConnection = (body: any): Promise<any> => {
 const createTrainingConnection = (body: any): Promise<any> => {
   return fetch(`${process.env.NEXT_PUBLIC_API_URL}${TRAINING_CONNECTION_API_URL}`, {
     method: "POST",
-    credentials: 'include',
+    // credentials: 'include',
     headers: {
       "Content-Type": "application/json",
     },
@@ -59,7 +59,7 @@ const createTrainingConnection = (body: any): Promise<any> => {
 const getHostAI = (): Promise<any> => {
   return fetch(`${process.env.NEXT_PUBLIC_API_URL}${GET_AI_HOST_API_URL}`, {
     method: "GET",
-    credentials: 'include',
+    // credentials: 'include',
     headers: {
       "Content-Type": "application/json",
     },
@@ -69,7 +69,7 @@ const getHostAI = (): Promise<any> => {
 const getCustomPrompts = (): Promise<BaseResponse<Array<CustomPrompt>>> => {
   return fetch(`${process.env.NEXT_PUBLIC_API_URL}${LIST_CUSTOM_PROMPT_API_URL}`, {
     method: "GET",
-    credentials: 'include',
+    // credentials: 'include',
     headers: {
       "Content-Type": "application/json",
     },
@@ -79,7 +79,7 @@ const getCustomPrompts = (): Promise<BaseResponse<Array<CustomPrompt>>> => {
 const getSQLConnections = (): Promise<BaseResponse<Array<CustomPrompt>>> => {
   return fetch(`${process.env.NEXT_PUBLIC_API_URL}${LIST_SQL_CONNECTION_API_URL}`, {
     method: "GET",
-    credentials: 'include',
+    // credentials: 'include',
     headers: {
       "Content-Type": "application/json",
     },
@@ -89,7 +89,7 @@ const getSQLConnections = (): Promise<BaseResponse<Array<CustomPrompt>>> => {
 const getTrainingConnections = (guid: string): Promise<BaseResponse<Array<TrainingConnection>>> => {
   return fetch(`${process.env.NEXT_PUBLIC_API_URL}${LIST_TRAINING_CONNECTION_API_URL}/${guid}`, {
     method: "GET",
-    credentials: 'include',
+    // credentials: 'include',
     headers: {
       "Content-Type": "application/json",
     },
@@ -129,7 +129,7 @@ const nlToSqlStream = async (body: Record<string, any>): Promise<ReadableStream 
 const updateCustomPrompt = (body: any): Promise<any> => {
   return fetch(`${process.env.NEXT_PUBLIC_API_URL}${CUSTOM_PROMPT_API_URL}`, {
     method: "PUT",
-    credentials: 'include',
+    // credentials: 'include',
     headers: {
       "Content-Type": "application/json",
     },
@@ -140,7 +140,7 @@ const updateCustomPrompt = (body: any): Promise<any> => {
 const updateSQLConnection = (body: any): Promise<any> => {
   return fetch(`${process.env.NEXT_PUBLIC_API_URL}${SQL_CONNECTION_API_URL}`, {
     method: "PUT",
-    credentials: 'include',
+    // credentials: 'include',
     headers: {
       "Content-Type": "application/json",
     },
@@ -151,7 +151,7 @@ const updateSQLConnection = (body: any): Promise<any> => {
 const updateTrainingConnection = (body: any): Promise<any> => {
   return fetch(`${process.env.NEXT_PUBLIC_API_URL}${TRAINING_CONNECTION_API_URL}`, {
     method: "PUT",
-    credentials: 'include',
+    // credentials: 'include',
     headers: {
       "Content-Type": "application/json",
     },
@@ -162,7 +162,7 @@ const updateTrainingConnection = (body: any): Promise<any> => {
 const deleteCustomPrompt = (guid: string): Promise<BaseResponse<Array<CustomPrompt>>> => {
   return fetch(`${process.env.NEXT_PUBLIC_API_URL}${CUSTOM_PROMPT_API_URL}/${guid}`, {
     method: "DELETE",
-    credentials: 'include',
+    // credentials: 'include',
     headers: {
       "Content-Type": "application/json",
     },
@@ -172,7 +172,7 @@ const deleteCustomPrompt = (guid: string): Promise<BaseResponse<Array<CustomProm
 const deleteSQLConnection = (guid: string): Promise<BaseResponse<Array<CustomPrompt>>> => {
   return fetch(`${process.env.NEXT_PUBLIC_API_URL}${SQL_CONNECTION_API_URL}/${guid}`, {
     method: "DELETE",
-    credentials: 'include',
+    // credentials: 'include',
     headers: {
       "Content-Type": "application/json",
     },
@@ -182,7 +182,7 @@ const deleteSQLConnection = (guid: string): Promise<BaseResponse<Array<CustomPro
 const deleteTrainingConnection = (guid: string): Promise<BaseResponse<Array<TrainingConnection>>> => {
   return fetch(`${process.env.NEXT_PUBLIC_API_URL}${TRAINING_CONNECTION_API_URL}/${guid}`, {
     method: "DELETE",
-    credentials: 'include',
+    // credentials: 'include',
     headers: {
       "Content-Type": "application/json",
     },
