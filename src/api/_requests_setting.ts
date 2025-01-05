@@ -15,9 +15,9 @@ const LIST_TRAINING_CONNECTION_API_URL = '/get-list-training-connection'
 const setHostAI = (body: any): Promise<any> => {
   return fetch(`${process.env.NEXT_PUBLIC_API_URL}${SET_AI_HOST_API_URL}`, {
     method: "POST",
-    
     headers: {
       "Content-Type": "application/json",
+      "ngrok-skip-browser-warning": "69420",
     },
     body: JSON.stringify(body),
   }).then((d: any) => d)
@@ -29,6 +29,7 @@ const createCustomPrompt = (body: any): Promise<any> => {
     
     headers: {
       "Content-Type": "application/json",
+      "ngrok-skip-browser-warning": "69420",
     },
     body: JSON.stringify(body),
   }).then((d: any) => d)
@@ -40,6 +41,7 @@ const createSQLConnection = (body: any): Promise<any> => {
     
     headers: {
       "Content-Type": "application/json",
+      "ngrok-skip-browser-warning": "69420",
     },
     body: JSON.stringify(body),
   }).then((d: any) => d)
@@ -51,6 +53,7 @@ const createTrainingConnection = (body: any): Promise<any> => {
     
     headers: {
       "Content-Type": "application/json",
+      "ngrok-skip-browser-warning": "69420",
     },
     body: JSON.stringify(body),
   }).then((d: any) => d)
@@ -61,6 +64,7 @@ const getHostAI = (): Promise<any> => {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
+      "ngrok-skip-browser-warning": "69420",
     },
   }).then((d: any) => d.json())
 }
@@ -70,6 +74,7 @@ const getCustomPrompts = (): Promise<BaseResponse<Array<CustomPrompt>>> => {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
+      "ngrok-skip-browser-warning": "69420",
     },
   }).then((d: any) => d.json())
 }
@@ -79,6 +84,7 @@ const getSQLConnections = (): Promise<BaseResponse<Array<CustomPrompt>>> => {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
+      "ngrok-skip-browser-warning": "69420",
     },
   }).then((d: any) => d.json())
 }
@@ -88,6 +94,7 @@ const getTrainingConnections = (guid: string): Promise<BaseResponse<Array<Traini
     method: "GET",
     headers: {
       "Content-Type": "application/json",
+      "ngrok-skip-browser-warning": "69420",
     },
   }).then((d: any) => d.json())
 }
@@ -100,6 +107,7 @@ const nlToSqlStream = async (body: Record<string, any>): Promise<ReadableStream 
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+      "ngrok-skip-browser-warning": "69420",
         },
         body: JSON.stringify(body),
       }
@@ -126,6 +134,7 @@ const updateCustomPrompt = (body: any): Promise<any> => {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
+      "ngrok-skip-browser-warning": "69420",
     },
     body: JSON.stringify(body),
   }).then((d: any) => d)
@@ -136,6 +145,7 @@ const updateSQLConnection = (body: any): Promise<any> => {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
+      "ngrok-skip-browser-warning": "69420",
     },
     body: JSON.stringify(body),
   }).then((d: any) => d)
@@ -146,6 +156,7 @@ const updateTrainingConnection = (body: any): Promise<any> => {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
+      "ngrok-skip-browser-warning": "69420",
     },
     body: JSON.stringify(body),
   }).then((d: any) => d)
@@ -156,6 +167,7 @@ const deleteCustomPrompt = (guid: string): Promise<BaseResponse<Array<CustomProm
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
+      "ngrok-skip-browser-warning": "69420",
     },
   }).then((d: any) => d.json())
 }
@@ -165,6 +177,7 @@ const deleteSQLConnection = (guid: string): Promise<BaseResponse<Array<CustomPro
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
+      "ngrok-skip-browser-warning": "69420",
     },
   }).then((d: any) => d.json())
 }
@@ -174,6 +187,7 @@ const deleteTrainingConnection = (guid: string): Promise<BaseResponse<Array<Trai
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
+      "ngrok-skip-browser-warning": "69420",
     },
   }).then((d: any) => d.json())
 }

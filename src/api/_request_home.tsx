@@ -18,6 +18,7 @@ const chatCustomPrompt = (body: any): Promise<any> => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+      "ngrok-skip-browser-warning": "69420",
       },
       body: JSON.stringify(body)
     }).then((d: any) => d)
@@ -28,6 +29,7 @@ const chatDatabase = (body: any): Promise<any> => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+      "ngrok-skip-browser-warning": "69420",
       },
       body: JSON.stringify(body),
     }).then((d: any) => d)
@@ -42,6 +44,7 @@ const chatDatabase = (body: any): Promise<any> => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+      "ngrok-skip-browser-warning": "69420",
           },
           body: JSON.stringify(body),
         }
@@ -68,6 +71,7 @@ const chatChart = (body: any): Promise<any> => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+      "ngrok-skip-browser-warning": "69420",
       },
       body: JSON.stringify(body),
     }).then((d: any) => d)
@@ -79,6 +83,7 @@ const createThread = (body: any): Promise<any> => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+      "ngrok-skip-browser-warning": "69420",
       },
       body: JSON.stringify(body),
     }).then((d: any) => d)
@@ -90,6 +95,7 @@ const getSources = (): Promise<BaseResponse<Array<Source>>> => {
         method: "GET",    
         headers: {
             "Content-Type": "application/json",
+      "ngrok-skip-browser-warning": "69420",
         },
     }).then((d: any) => d.json())
 }
@@ -99,6 +105,7 @@ const getThreads = (): Promise<BaseResponse<Array<Thread>>> => {
         method: "GET",    
         headers: {
             "Content-Type": "application/json",
+      "ngrok-skip-browser-warning": "69420",
         },
     }).then((d: any) => d.json())
 }
@@ -108,6 +115,7 @@ const getThread = (guid: string): Promise<BaseResponse<ThreadDetailWrapper>> => 
     method: "GET",
     headers: {
       "Content-Type": "application/json",
+      "ngrok-skip-browser-warning": "69420",
     },
   }).then((d: any) => d.json())
 }
@@ -117,6 +125,7 @@ const deleteThread = (guid: string): Promise<BaseResponse<any>> => {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
+      "ngrok-skip-browser-warning": "69420",
     },
   }).then((d: any) => d.json())
 }
@@ -126,6 +135,7 @@ const clearThread = (): Promise<BaseResponse<any>> => {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
+      "ngrok-skip-browser-warning": "69420",
     },
   }).then((d: any) => d.json())
 }
