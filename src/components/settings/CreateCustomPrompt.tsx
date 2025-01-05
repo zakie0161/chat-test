@@ -1,6 +1,6 @@
 // pages/create-project.tsx
 import { CustomPrompt } from "@/pages/settings/core/_models";
-import { createCustomPrompt, updateCustomPrompt } from "@/pages/settings/core/_requests";
+import { createCustomPrompt, updateCustomPrompt } from "@/api/_requests_setting";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 

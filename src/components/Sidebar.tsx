@@ -1,4 +1,4 @@
-import { clearThread, createThread, deleteThread, getThreads } from "@/pages/home/core/_request";
+import { clearThread, createThread, deleteThread, getThreads } from "@/api/_request_home";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import {
@@ -12,7 +12,7 @@ import { FiMessageSquare } from "react-icons/fi";
 import { FaTimes } from "react-icons/fa";
 import { MdLogout } from "react-icons/md";
 import Shimmer from "./Shimmer";
-import { Thread } from "@/pages/home/core/_models";
+import { Thread } from "@/pages/home/core/_models.d";
 import { useRouter } from "next/router";
 
 const Sidebar = () => {

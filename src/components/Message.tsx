@@ -4,7 +4,7 @@ import { TbCursorText } from "react-icons/tb";
 import Markdown from "markdown-to-jsx";
 import ChartFromJson from "./ChartFromJson";
 import { useRef, useState } from "react";
-import { chatChart } from "@/pages/home/core/_request";
+import { chatChart } from "@/api/_request_home";
 
 const Message = (props: any) => {
   const { message } = props;

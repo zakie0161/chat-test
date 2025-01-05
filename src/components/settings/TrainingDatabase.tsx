@@ -1,5 +1,5 @@
 import { SQLConnection, TrainingConnection } from "@/pages/settings/core/_models";
-import { createTrainingConnection, getTrainingConnections, nlToSqlStream } from "@/pages/settings/core/_requests";
+import { createTrainingConnection, getTrainingConnections, nlToSqlStream } from "@/api/_requests_setting";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 const sqlFormatter = require("sql-formatter");

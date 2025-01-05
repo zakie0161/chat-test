@@ -1,6 +1,6 @@
 // pages/index.tsx
 import { SQLConnection } from '@/pages/settings/core/_models';
-import { createSQLConnection, updateSQLConnection } from '@/pages/settings/core/_requests';
+import { createSQLConnection, updateSQLConnection } from '@/api/_requests_setting';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 

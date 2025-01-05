@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { AiOutlineDelete, AiOutlineSetting } from 'react-icons/ai';
 import Modal from '../Modal';
 import CreateCustomPrompt from './CreateCustomPrompt';
-import { deleteCustomPrompt, getCustomPrompts } from '@/pages/settings/core/_requests';
+import { deleteCustomPrompt, getCustomPrompts } from '@/api/_requests_setting';
 import { CustomPrompt } from '@/pages/settings/core/_models';
 import moment from 'moment';
 import Shimmer from '../Shimmer';

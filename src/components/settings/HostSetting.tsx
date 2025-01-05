@@ -1,4 +1,4 @@
-import { getHostAI, setHostAI } from "@/pages/settings/core/_requests";
+import { getHostAI, setHostAI } from "@/api/_requests_setting";
 import React, { useEffect, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";

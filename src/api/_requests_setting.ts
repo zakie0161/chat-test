@@ -1,5 +1,5 @@
 import { BaseResponse } from "@/core/_models"
-import { CustomPrompt, TrainingConnection } from "./_models"
+import { CustomPrompt, TrainingConnection } from "../pages/settings/core/_models"
 
 const SET_AI_HOST_API_URL = '/set-ai-host'
 const CUSTOM_PROMPT_API_URL = '/custom-prompt'

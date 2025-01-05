@@ -7,8 +7,8 @@ import useAnalytics from "@/hooks/useAnalytics";
 import useAutoResizeTextArea from "@/hooks/useAutoResizeTextArea";
 import Message from "./Message";
 import { DEFAULT_OPENAI_MODEL } from "@/shared/Constants";
-import { chatChart, chatCustomPrompt, chatCustomPromptStream, chatDatabase, createThread, getSources, getThread } from "@/pages/home/core/_request";
-import { Source, ThreadDetail } from "@/pages/home/core/_models";
+import { chatChart, chatCustomPrompt, chatCustomPromptStream, chatDatabase, createThread, getSources, getThread } from "@/api/_request_home";
+import { Source, ThreadDetail } from "@/pages/home/core/_models.d";
 import PopupMenu from "./PopupMenu";
 import { useRouter } from "next/router";
 

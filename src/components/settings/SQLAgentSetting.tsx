@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import Modal from "../Modal";
 import CreateNewConnectionSQL from "./CreateNewConnectionSQL";
-import { deleteSQLConnection, getSQLConnections } from "@/pages/settings/core/_requests";
+import { deleteSQLConnection, getSQLConnections } from "@/api/_requests_setting";
 import { SQLConnection } from "@/pages/settings/core/_models";
 import ModalDelete from "../ModalDelete";
 import TrainingDatabase from "./TrainingDatabase";

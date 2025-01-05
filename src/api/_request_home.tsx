@@ -1,6 +1,5 @@
 import { BaseResponse } from "@/core/_models"
-import { TrainingConnection } from "@/pages/settings/core/_models"
-import { Source, Thread, ThreadDetailWrapper } from "./_models"
+import { Source, Thread, ThreadDetailWrapper } from "../pages/home/core/_models"
 
 const CHAT_CUSTOM_PROMPT_API_URL = '/generate-from-custom-prompt'
 const CHAT_DATABASE_API_URL = '/generate-query'
