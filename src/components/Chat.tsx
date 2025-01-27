@@ -237,7 +237,6 @@ const Chat = (props: any) => {
         guid: sourceGuid ?? selectedSource?.guid ?? '',
         thread_guid: guid
       }
-
       if(selectedSource?.type === 'database'){
         handleChatDatabase(body);
       }else{

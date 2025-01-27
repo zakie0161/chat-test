@@ -80,10 +80,10 @@ const CreateNewConnectionSQL: React.FC<ModalProps> = ({ setIsOpen, data }) => {
         if (!formState.password.trim()) {
             newErrors.password = "Database password is required.";
         }
-        if (!formState.host.trim()) {
+        if (!formState.host) {
             newErrors.host = "Server host is required.";
         }
-        if (!formState.port.trim()) {
+        if (!formState.port) {
             newErrors.port = "Port is required.";
         }
         return newErrors;
