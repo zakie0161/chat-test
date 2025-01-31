@@ -10,7 +10,12 @@ interface ChartFromJsonProps {
 const ChartFromJson: React.FC<ChartFromJsonProps> = ({ data }) => {
 
     const [loading, setLoading] = useState(true);
-    console.log(data)
+    // console.log(data)
+
+    if(!data){
+        return <div></div>
+    }
+
     return (
         <div className="">
             {loading && (
@@ -21,8 +26,8 @@ const ChartFromJson: React.FC<ChartFromJsonProps> = ({ data }) => {
                 </div>
             )}
             <Plot
-                data={data.data}
-                layout={data.layout}
+                data={data?.data}
+                layout={data?.layout}
                 onInitialized={() => setLoading(false)} // Chart initialized
                 onUpdate={() => setLoading(false)} // Chart updated
             />

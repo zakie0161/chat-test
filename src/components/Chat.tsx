@@ -76,12 +76,13 @@ const Chat = (props: any) => {
     
     var message = localStorage.getItem("message")
     var sourceGuid = localStorage.getItem("source_guid")
+    var sourceType = localStorage.getItem("source_type")
 
     if(guid){
       if(message){
 
         setMessage(message)
-        sendMessage(null!, message, sourceGuid?.toString())
+        sendMessage(null!, message, sourceGuid?.toString(), sourceType?.toString())
         if (textAreaRef.current) {
           textAreaRef.current.focus();
         }
@@ -103,6 +104,7 @@ const Chat = (props: any) => {
     if(sourceGuid){
       setInitSelectedSource(sourceGuid)
       localStorage.setItem("source_guid", "")
+      localStorage.setItem("source_type", "")
     }
 
   }, [sources, guid]);
@@ -149,16 +151,16 @@ const Chat = (props: any) => {
     }
   };
 
-  const handleChatDatabase = async (body: Record<string, any>) => {
+  const handleChatDatabase = async (body: Record<string, any>, newMessage: string) => {
     var response = await chatDatabase(body);
 
       if (response.ok) {
         const data = await response.json();
-        console.log(data.result)
+        console.log(data?.chart)
         // Add the message to the conversation
         setConversation([
           ...conversation,
-          { content: message, role: "user" },
+          { content: newMessage, role: "user" },
           { 
             content: data.result, 
             role: "system", 
@@ -186,6 +188,7 @@ const Chat = (props: any) => {
 
     localStorage.setItem("message", message);
     localStorage.setItem("source_guid", selectedSource?.guid ?? '');
+    localStorage.setItem("source_type", selectedSource?.type ?? '');
     
     if (response.ok) {
       const data = await response.json();
@@ -197,7 +200,7 @@ const Chat = (props: any) => {
     }
 };
 
-  const sendMessage = async (e: any, messageFromStart?: string, sourceGuid?: string) => {
+  const sendMessage = async (e: any, messageFromStart?: string, sourceGuid?: string, sourceType?: string) => {
 
     let newMessage = messageFromStart? messageFromStart : message
 
@@ -237,8 +240,9 @@ const Chat = (props: any) => {
         guid: sourceGuid ?? selectedSource?.guid ?? '',
         thread_guid: guid
       }
-      if(selectedSource?.type === 'database'){
-        handleChatDatabase(body);
+
+      if((sourceType ?? selectedSource?.type) === 'database'){
+        handleChatDatabase(body, newMessage);
       }else{
         handleChatStream(body, newMessage);
       }

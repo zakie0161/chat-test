@@ -3,8 +3,9 @@ import { HiUser } from "react-icons/hi";
 import { TbCursorText } from "react-icons/tb";
 import Markdown from "markdown-to-jsx";
 import ChartFromJson from "./ChartFromJson";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { chatChart } from "@/api/_request_home";
+import { MarkdownRenderer } from "./MarkDownRenderer";
 
 const Message = (props: any) => {
   const { message } = props;
@@ -13,10 +14,25 @@ const Message = (props: any) => {
   const [showPrompt, setShowPrompt] = useState(false);
   const [promptText, setPromptText] = useState("");
   const [chart, setChart] = useState<any>();
+  const [chartValue, setChartValue] = useState<any>();
   const [isLoadingChart, setIsLoadingChart] = useState(false);
   const textAreaRef = useRef<HTMLTextAreaElement>(null); // Referensi untuk textarea
 
   const isUser = role === "user";
+
+  function isValidJSON(value: any) {
+    try {
+      JSON.parse(value);
+      return true; // Valid JSON
+    } catch (error) {
+      return false; // Invalid JSON
+    }
+  }
+
+  function isNotString(value: any) {
+    return typeof value !== "string";
+  }
+
 
   const handleSubmit = async () => {
     if (promptText) {
@@ -68,6 +84,20 @@ const Message = (props: any) => {
     setPromptText(""); // Reset prompt jika kehilangan fokus
   };
 
+  useEffect(() => {
+
+    if(isValidJSON(text)){
+      if(JSON.parse(text)?.data){
+        setChart(isValidJSON(text))
+        setChartValue(JSON.parse(text))
+      }
+    }else if(isNotString(text)){
+      setChart(true)
+      setChartValue(text)
+    }
+    
+  }, [text]);
+
 
   return (
     <div
@@ -98,7 +128,7 @@ const Message = (props: any) => {
           </div>
           <div className="relative flex w-[calc(100%-50px)] flex-col gap-1 md:gap-3 lg:w-[calc(100%-115px)]">
             <div className="flex flex-grow flex-col gap-3">
-              <div className="min-h-20 flex flex-col items-start gap-4 whitespace-pre-wrap break-words">
+              <div className="min-h-20 flex flex-col items-start gap-4 break-words">
                 <div className="markdown prose w-full break-words dark:prose-invert dark">
                   {!isUser && text === null ? (
                     <TbCursorText className="h-6 w-6 animate-pulse" />
@@ -106,31 +136,13 @@ const Message = (props: any) => {
                     <>
                       <div className="markdown text-white">
                         {table && "Here data table : "}
-                        <Markdown
-                          options={{
-                            overrides: {
-                              h1: {
-                                component: 'h1',
-                                props: {
-                                  className: 'text-2xl font-bold',
-                                },
-                              },
-                              p: {
-                                component: 'p',
-                                props: {
-                                  className: 'text-gray-700',
-                                },
-                              },
-                            },
-                          }}
-                        >
-                          {text}
-                        </Markdown>
+                        {(!chart && !isNotString(text)) && <MarkdownRenderer children={text} />}
                       </div>
                       {chart &&
-                        <div className="flex flex-col mt-5 text-white">
+
+                        <div className="flex flex-col text-white">
                           <span className="mb-2">Here data chart : </span>
-                          <ChartFromJson data={chart} />
+                          <ChartFromJson data={chartValue} />
                         </div>
                       }
                     </>
